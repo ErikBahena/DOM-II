@@ -23,21 +23,73 @@ pageImagesArr.forEach((img) => {
 });
 
 // I want to make it so that the h2s I am hovering over increase in front size a bit
+let growTo = function (el, fontSize) {
+  return gsap.to(el, {
+    duration: 0.1,
+    ease: "power4.out",
+    fontSize: fontSize,
+  });
+};
+
+let changeColorTo = function (el, color) {
+  return gsap.to(el, { duration: 0, color });
+};
+
 document.addEventListener("mouseover", function (e) {
   const hoveredEl = e.target;
   const hoveredElTagName = hoveredEl.tagName;
   if (hoveredElTagName !== "H2") return; // If the element is not an h2 then I dont want to do anything
+  let h2Grow = growTo(hoveredEl, "4rem");
 
-  let grow = gsap.to(hoveredEl, {
-    duration: 0.1,
-    ease: "power4.out",
-    fontSize: "4rem",
-  });
-
-  grow.play();
-
+  h2Grow.play();
   //   once I mouseout of that element, I want to revert the font size back to the original font size
   hoveredEl.addEventListener("mouseout", function () {
-    grow.reverse();
+    h2Grow.reverse();
   });
+});
+
+// preventing the nav links default behaviour
+const navLinks = document.querySelectorAll("nav a");
+navLinks.forEach((link) =>
+  link.addEventListener("click", function (e) {
+    e.preventDefault();
+  })
+);
+// making the nav links grow and turn into a different color
+navLinks.forEach((link) =>
+  link.addEventListener("mouseover", function () {
+    let navLinksGrow = growTo(link, "2rem");
+    let navLinksChangeCol = changeColorTo(link, "red");
+
+    link.addEventListener("mouseout", function () {
+      navLinksGrow.reverse();
+      navLinksChangeCol.reverse();
+    });
+  })
+);
+
+// find text feature with the keydown event
+
+document.addEventListener("keydown", function (e) {
+  if (e.key.match(/[A-Z|a-z|ü|é]/i) && e.key.length === 1) {
+    window.find(e.key);
+  }
+});
+
+// I am going to add an event listener to the entire content pick section because I don't want to add an event listener to every single button, although there are not many, on a larger scale this could really slow down your site.
+document.querySelector(".content-pick").addEventListener("click", function (e) {
+  const button = e.target;
+  if (!button.classList.contains("btn")) return;
+  button.style.backgroundColor = "red";
+});
+
+//  make the nav sticky one we scroll to the right spot with position fixed
+// there is a far more efficient way to do this but I don't remember how.
+const navBar = document.querySelector(".main-navigation");
+window.addEventListener("scroll", function (e) {
+  if (window.pageYOffset >= 90) {
+    navBar.style.position = "fixed";
+  } else {
+    navBar.style.position = "unset";
+  }
 });
